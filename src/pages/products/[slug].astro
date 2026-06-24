@@ -1,0 +1,101 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Badge from "@/components/ui/Badge.astro";
+import Button from "@/components/ui/Button.astro";
+import Icon from "@/components/ui/Icon.astro";
+import ProductCard from "@/components/products/ProductCard.astro";
+import {
+  getAllProducts,
+  getRelatedProducts,
+  CATEGORY_LABELS_FA,
+  STOCK_LABELS_FA,
+} from "@/lib/products";
+
+export async function getStaticPaths() {
+  const products = await getAllProducts();
+  return products.map((product) => ({
+    params: { slug: product.id },
+    props: { product },
+  }));
+}
+
+const { product } = Astro.props;
+const related = await getRelatedProducts(product, 4);
+
+const stockVariant =
+  product.stockStatus === "in_stock" ? "success" : product.stockStatus === "limited" ? "warning" : "neutral";
+---
+
+<Layout title={product.title} description={product.shortDescription} image={product.image}>
+  <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+    <!-- مسیر breadcrumb -->
+    <nav class="mb-8 flex items-center gap-2 text-sm text-ink-400">
+      <a href="/" class="hover:text-brand-600">خانه</a>
+      <Icon name="chevron-left" class="size-3.5 rotate-180" />
+      <a href="/products" class="hover:text-brand-600">محصولات</a>
+      <Icon name="chevron-left" class="size-3.5 rotate-180" />
+      <span class="truncate text-ink-600">{product.title}</span>
+    </nav>
+
+    <div class="grid gap-12 lg:grid-cols-2">
+      <!-- گالری تصویر -->
+      <div>
+        <div class="aspect-square overflow-hidden rounded-2xl border border-ink-100 bg-ink-50">
+          <img src={product.image} alt={product.title} class="size-full object-cover" />
+        </div>
+        {
+          product.gallery && product.gallery.length > 1 && (
+            <div class="mt-4 grid grid-cols-4 gap-3">
+              {product.gallery.map((img) => (
+                <div class="aspect-square overflow-hidden rounded-xl border border-ink-100 bg-ink-50">
+                  <img src={img} alt="" class="size-full object-cover" />
+                </div>
+              ))}
+            </div>
+          )
+        }
+      </div>
+
+      <!-- اطلاعات محصول -->
+      <div>
+        <div class="flex items-center gap-2">
+          <Badge variant="brand">{product.brand}</Badge>
+          <Badge variant="neutral">{CATEGORY_LABELS_FA[product.category]}</Badge>
+        </div>
+
+        <h1 class="mt-4 text-2xl font-bold leading-9 text-ink-900 sm:text-3xl">{product.title}</h1>
+        <p class="mt-2 text-sm text-ink-400" dir="ltr">کد فنی: {product.modelCode}</p>
+
+        <p class="mt-6 leading-8 text-ink-600">{product.fullDescription}</p>
+
+        <div class="mt-6">
+          <Badge variant={stockVariant}>{STOCK_LABELS_FA[product.stockStatus]}</Badge>
+        </div>
+
+        <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+          <Button href="/contact" size="lg">
+            <Icon name="phone" class="size-4" />
+            استعلام قیمت و تماس
+          </Button>
+          <Button href="/products" variant="outline" size="lg">
+            بازگشت به محصولات
+          </Button>
+        </div>
+      </div>
+    </div>
+
+    <!-- محصولات مرتبط -->
+    {
+      related.length > 0 && (
+        <div class="mt-20">
+          <h2 class="text-2xl font-bold text-ink-900">محصولات مرتبط</h2>
+          <div class="mt-8 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
+            {related.map((p) => (
+              <ProductCard product={p} />
+            ))}
+          </div>
+        </div>
+      )
+    }
+  </div>
+</Layout>

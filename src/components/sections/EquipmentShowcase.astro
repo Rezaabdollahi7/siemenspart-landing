@@ -1,0 +1,79 @@
+---
+import Button from "@/components/ui/Button.astro";
+import Icon from "@/components/ui/Icon.astro";
+
+interface EquipmentItem {
+  image: string;
+  title: string;
+  description: string;
+}
+
+const equipment: EquipmentItem[] = [
+  {
+    image: "/images/drive.png",
+    title: "درایو زیمنس",
+    description: "تعمیر و بازسازی انواع درایوهای سروو زیمنس با تست بار کامل پیش از تحویل."
+  },
+  {
+    image: "/images/servo-motor.png",
+    title: "موتور سروو",
+    description: "تعمیر تخصصی و تامین موتورهای سروو با تست عایق و کالیبراسیون دقیق."
+  },
+  {
+    image: "/images/spindle.png",
+    title: "موتور اسپیندل",
+    description: "بازسازی موتورهای اسپیندل با بلبرینگ استاندارد و تست دور بالا."
+  },
+  {
+    image: "/images/linear-scale.png",
+    title: "خط‌کش دیجیتال",
+    description: "تعمیر و تامین خط‌کش‌های دیجیتال با دقت موقعیت‌یابی تضمین‌شده."
+  },
+  {
+    image: "/images/encoder.png",
+    title: "انکودر",
+    description: "تعمیر و تنظیم انکودرهای دورانی برای کاهش خطای موقعیت‌یابی دستگاه."
+  },
+  {
+    image: "/images/hmi.png",
+    title: "نمایشگر HMI",
+    description: "تعمیر پنل‌های کنترل و نمایشگرهای صنعتی با تست کامل سخت‌افزار."
+  },
+];
+---
+
+<section class="py-20 sm:py-24">
+  <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-2xl text-center">
+      <h2 class="text-3xl font-bold text-ink-900 sm:text-4xl">تجهیزات و قطعاتی که تعمیر و تأمین می‌کنیم</h2>
+      <p class="mt-4 text-ink-500">تعمیر تخصصی با ضمانت کیفیت و سرعت بالا</p>
+    </div>
+
+    <div class="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {
+        equipment.map((item) => (
+          <div class="group flex flex-col overflow-hidden rounded-2xl border border-ink-100 bg-white shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-brand-200 hover:shadow-card-hover">
+            <div class="relative aspect-square overflow-hidden bg-ink-50">
+              <img
+                src={item.image}
+                alt={item.title}
+                loading="lazy"
+                class="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+              <div class="absolute inset-0 bg-linear-to-t from-ink-950/50 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+            </div>
+
+            <div class="flex flex-1 flex-col p-6">
+              <h3 class="text-lg font-bold text-ink-900 transition-colors group-hover:text-brand-600 text-center">
+                {item.title}
+              </h3>
+              <p class="mt-2 flex-1 text-sm leading-7 text-ink-500 text-center">{item.description}</p>
+
+         
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>

@@ -1,0 +1,47 @@
+---
+import { cn } from "@/lib/utils";
+
+interface Props {
+  variant?: "primary" | "secondary" | "outline" | "ghost";
+  size?: "sm" | "md" | "lg";
+  href?: string;
+  class?: string;
+  type?: "button" | "submit";
+}
+
+const {
+  variant = "primary",
+  size = "md",
+  href,
+  class: className,
+  type = "button",
+  ...rest
+} = Astro.props;
+
+const base =
+  "inline-flex items-center justify-center gap-2 rounded-xl font-medium transition-all duration-200 select-none disabled:opacity-50 disabled:pointer-events-none";
+
+const variants = {
+  primary:
+    "bg-brand-500 text-white shadow-card hover:bg-brand-600 hover:shadow-card-hover active:bg-brand-700",
+  secondary:
+    "bg-ink-900 text-white hover:bg-ink-800 shadow-card hover:shadow-card-hover",
+  outline:
+    "border border-ink-200 text-ink-800 hover:border-brand-400 hover:text-brand-600 bg-white",
+  ghost: "text-ink-700 hover:bg-ink-50 hover:text-brand-600",
+};
+
+const sizes = {
+  sm: "h-9 px-4 text-sm",
+  md: "h-11 px-6 text-[15px]",
+  lg: "h-13 px-8 text-base",
+};
+
+const classes = cn(base, variants[variant], sizes[size], className);
+
+const Tag = href ? "a" : "button";
+---
+
+<Tag class={classes} href={href} type={!href ? type : undefined} {...rest}>
+  <slot />
+</Tag>

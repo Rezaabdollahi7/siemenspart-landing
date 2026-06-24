@@ -1,0 +1,150 @@
+@import "tailwindcss";
+
+/* ----------------------------------------------------
+   فونت IRANSans (self-hosted)
+   نکته: فایل‌های فعلی جایگزین موقت (Vazirmatn) هستند چون
+   فایل اصلی IRANSans در دسترس نبود. برای جایگزینی نهایی،
+   کافیست فایل‌های public/fonts/iransans-*.woff2 را با
+   نسخه اصلی IRANSans (با همین نام‌گذاری) overwrite کنید.
+---------------------------------------------------- */
+@font-face {
+  font-family: "Peyda";
+  src:
+    url("/fonts/PeydaWeb-light.woff2") format("woff2"),
+    url("/fonts/PeydaWeb-light.woff") format("woff");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Peyda";
+  src:
+    url("/fonts/PeydaWeb-Regular.woff2") format("woff2"),
+    url("/fonts/PeydaWeb-Regular.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Peyda";
+  src:
+    url("/fonts/PeydaWeb-Medium.woff2") format("woff2"),
+    url("/fonts/PeydaWeb-Medium.woff") format("woff");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Peyda";
+  src:
+    url("/fonts/PeydaWeb-SemiBold.woff2") format("woff2"),
+    url("/fonts/PeydaWeb-SemiBold.woff") format("woff");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Peyda";
+  src:
+    url("/fonts/PeydaWeb-Bold.woff2") format("woff2"),
+    url("/fonts/PeydaWeb-Bold.woff") format("woff");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Peyda";
+  src:
+    url("/fonts/PeydaWeb-ExtraBold.woff2") format("woff2"),
+    url("/fonts/PeydaWeb-ExtraBold.woff") format("woff");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ----------------------------------------------------
+   توکن‌های تم Tailwind v4 — رنگ برند و فونت
+---------------------------------------------------- */
+@theme {
+  --font-sans: "Peyda", "Vazirmatn", system-ui, sans-serif;
+
+  /* رنگ اصلی برند: تیل/سبزآبی صنعتی #009999 و طیف کامل آن */
+  --color-brand-50: #eafafa;
+  --color-brand-100: #cdf2f2;
+  --color-brand-200: #9fe6e6;
+  --color-brand-300: #66d4d4;
+  --color-brand-400: #2fb9b9;
+  --color-brand-500: #009999;
+  --color-brand-600: #008080;
+  --color-brand-700: #016666;
+  --color-brand-800: #0a5252;
+  --color-brand-900: #0c4444;
+  --color-brand-950: #042828;
+
+  /* خاکستری‌های خنثی برای پالت روشن و حس صنعتی پریمیوم */
+  --color-ink-50: #f7f8f8;
+  --color-ink-100: #eceeee;
+  --color-ink-200: #d6dada;
+  --color-ink-300: #b3bbbb;
+  --color-ink-400: #889393;
+  --color-ink-500: #6b7676;
+  --color-ink-600: #555f5f;
+  --color-ink-700: #454d4d;
+  --color-ink-800: #2e3434;
+  --color-ink-900: #1c2020;
+  --color-ink-950: #0e1111;
+
+  --shadow-card:
+    0 1px 2px 0 rgb(14 17 17 / 0.04), 0 4px 16px -4px rgb(14 17 17 / 0.06);
+  --shadow-card-hover:
+    0 8px 24px -4px rgb(0 153 153 / 0.16), 0 2px 8px -2px rgb(14 17 17 / 0.06);
+}
+
+/* ----------------------------------------------------
+   تنظیمات پایه RTL و تایپوگرافی
+---------------------------------------------------- */
+html {
+  direction: rtl;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  @apply bg-white text-ink-800 antialiased;
+}
+
+/* اسکرول‌بار ظریف برای حس پریمیوم */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-ink-200);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-brand-300);
+}
+
+/* فوکوس قابل دسترس و یکدست در سراسر سایت */
+:focus-visible {
+  outline: 2px solid var(--color-brand-500);
+  outline-offset: 2px;
+}
+
+/* انیمیشن ظاهرشدن نرم برای بخش‌ها */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-up {
+  animation: fade-up 0.6s ease-out both;
+}

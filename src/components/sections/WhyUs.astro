@@ -1,0 +1,63 @@
+---
+import Icon from "@/components/ui/Icon.astro";
+
+const benefits = [
+  {
+    icon: "shield" as const,
+    title: "ضمانت کیفیت",
+    description: "تمامی قطعات پیش از تحویل تحت تست فنی کامل قرار می‌گیرند.",
+  },
+  {
+    icon: "clock" as const,
+    title: "تحویل سریع",
+    description: "آماده‌سازی و ارسال سریع دستگاه ها برای کاهش توقف خط تولید.",
+  },
+  {
+    icon: "wrench" as const,
+    title: "تیم فنی مجرب",
+    description: "بیش از دو دهه تجربه عملی در تعمیر تجهیزات CNC صنعتی.",
+  },
+  {
+    icon: "users" as const,
+    title: "مشاوره تخصصی",
+    description: "راهنمایی دقیق درباره ی ایرادات و نکات فنی دستگاه ها",
+  },
+];
+---
+
+<section class="py-20 sm:py-24">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="grid items-center gap-16 lg:grid-cols-2">
+      <div>
+        <h2 class="text-3xl font-bold text-ink-900 sm:text-4xl">چرا زیمنس‌پارت؟</h2>
+        <p class="mt-4 max-w-lg leading-7 text-ink-500">
+          ترکیبی از دانش فنی عمیق، انبار گسترده قطعات اصلی، و تعهد به کیفیت، ما را به انتخاب اول صنایع برای تعمیر
+           قطعات Siemens و Heidenhain تبدیل کرده است.
+        </p>
+
+        <div class="mt-10 grid grid-cols-2 gap-6">
+          <div class="rounded-2xl border border-ink-100 bg-white p-6 shadow-card">
+            <p class="text-3xl font-bold text-brand-600">+۳۰۰</p>
+            <p class="mt-1 text-sm text-ink-500">قطعه یدکی موجود</p>
+          </div>
+          <div class="rounded-2xl border border-ink-100 bg-white p-6 shadow-card">
+            <p class="text-3xl font-bold text-brand-600">+۲۰۰۰</p>
+            <p class="mt-1 text-sm text-ink-500">پروژه تعمیر موفق</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid gap-5 sm:grid-cols-2">
+        {
+          benefits.map((b) => (
+            <div class="rounded-2xl border border-ink-100 p-6 transition-colors  hover:border-brand-200 hover:bg-brand-50/30">
+              <Icon name={b.icon} class="size-11 bg-brand-500 text-white p-3 rounded-2xl" />
+              <h3 class="mt-4 text-[15px] font-bold text-ink-900">{b.title}</h3>
+              <p class="mt-2 text-sm leading-6 text-ink-500">{b.description}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>

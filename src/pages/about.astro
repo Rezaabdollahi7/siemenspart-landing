@@ -1,0 +1,71 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Icon from "@/components/ui/Icon.astro";
+
+const values = [
+  { icon: "shield" as const, title: "کیفیت بدون تعارف", text: "تست فنی کامل پیش از تحویل هر قطعه، بدون استثنا." },
+  { icon: "wrench" as const, title: "دانش فنی عمیق", text: "تیمی متشکل از مهندسان مجرب در حوزه الکترونیک و مکانیک صنعتی." },
+  { icon: "users" as const, title: "مشتری‌محوری", text: "مشاوره شفاف و صادقانه، حتی اگر به معنای نه گفتن به یک فروش باشد." },
+];
+
+const timeline = [
+  { year: "۱۳۹۰", text: "شروع فعالیت به‌عنوان یک کارگاه تخصصی تعمیر الکترونیک صنعتی." },
+  { year: "۱۳۹۴", text: "گسترش فعالیت به تامین قطعات یدکی دستگاه ها." },
+  { year: "۱۳۹۷", text: "راه‌اندازی آزمایشگاه تست استاندارد برای موتورها و درایوها." },
+  { year: "۱۴۰۰", text: "همکاری با بیش از ۵۰۰ پروژه صنعتی در سراسر کشور." },
+];
+---
+
+<Layout
+  title="درباره ما"
+  description="آشنایی با گروه زیمنس‌پارت، تاریخچه فعالیت و تخصص ما در تعمیر و تامین قطعات یدکی CNC."
+>
+  <section class="border-b border-ink-100 bg-ink-50/40 py-16">
+    <div class="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
+      <h1 class="text-3xl font-bold text-ink-900 sm:text-4xl">درباره گروه زیمنس‌پارت</h1>
+      <p class="mt-5 leading-8 text-ink-500">
+        گروه مهندسی زیمنس پارت از سال ۱۳۹۰ با مدیریت مهندس داوود جعفری فعالیت تجاری خود را آغاز نموده و با دارا بودن یک شعبه اصلی در شهر صنعتی البرز واقع در استان قزوین در زمینه تعمیرات , تجهیزات کنترلی زیمنس ماشین های CNC و تجهیزات اندازه گیری از قبیل خط کش ها و انکودر ها و خرده فروشی تجهیزات و ماشین آلات فعالیت دارد . 
+      <br>
+       ماموریت ما کاهش زمان توقف خطوط تولید صنعتی از طریق ارائه خدمات فنی دقیق و قطعات قابل اعتماد است  .
+      </p>
+    </div>
+  </section>
+
+  <section class="py-16 sm:py-20">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <h2 class="text-center text-2xl font-bold text-ink-900 sm:text-3xl">ارزش‌های ما</h2>
+      <div class="mt-12 grid gap-6 sm:grid-cols-3">
+        {
+          values.map((v) => (
+            <div class="rounded-2xl border border-ink-100 p-7 text-center shadow-card">
+              <div class="mx-auto flex size-13 items-center justify-center rounded-2xl bg-brand-50">
+                <Icon name={v.icon} class="size-6 text-brand-600" />
+              </div>
+              <h3 class="mt-5 font-bold text-ink-900">{v.title}</h3>
+              <p class="mt-2 text-sm leading-7 text-ink-500">{v.text}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-ink-50/50 py-16 sm:py-20">
+    <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+      <h2 class="text-center text-2xl font-bold text-ink-900 sm:text-3xl">مسیر رشد ما</h2>
+      <div class="mt-12 space-y-8 border-r-2 border-brand-200 pr-8">
+        {
+          timeline.map((t) => (
+            <div class="relative">
+              <span class="absolute right-[-2.55rem] top-1 flex size-4 items-center justify-center rounded-full bg-brand-500 ring-4 ring-white" />
+              <p class="text-sm font-bold text-brand-600" dir="ltr">
+                {t.year}
+              </p>
+              <p class="mt-1 leading-7 text-ink-600">{t.text}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</Layout>

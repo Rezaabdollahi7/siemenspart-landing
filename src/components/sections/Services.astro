@@ -1,0 +1,50 @@
+---
+import Card from "@/components/ui/Card.astro";
+import Icon from "@/components/ui/Icon.astro";
+
+const services = [
+  {
+    icon: "wrench" as const,
+    title: "تعمیر تخصصی",
+    description:
+      "تعمیر و بازسازی موتورها، درایوها و کنترل‌پنل‌های Siemens و Heidenhain توسط تیم فنی مجرب با تجهیزات تست استاندارد.",
+  },
+  {
+    icon: "package" as const,
+    title: "تامین قطعات یدکی",
+    description:
+      "دسترسی به انبار گسترده‌ای از قطعات اصلی و بازسازی‌شده برای جایگزینی سریع ",
+  },
+  {
+    icon: "users" as const,
+    title: "مشاوره فنی",
+    description:
+      "ارائه مشاوره تخصصی برای تعمیر درایو ها و دستگاه های صنعتی ",
+  },
+];
+---
+
+<section id="services" class="py-20 sm:py-24 mb-16">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-2xl text-center">
+      <h2 class="text-3xl font-bold text-ink-900 sm:text-4xl">خدمات ما</h2>
+      <p class="mt-4 text-ink-500">
+        از تعمیر تخصصی تا سفارش و تامین قطعه و مشاوره فنی راه اندازی دستگاه ،  همراه صنعت شما هستیم.
+      </p>
+    </div>
+
+    <div class="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {
+        services.map((service) => (
+          <Card hover class="p-8">
+            <div class="flex size-13 items-center justify-center rounded-2xl bg-brand-50">
+              <Icon name={service.icon} class="size-6 text-brand-600" />
+            </div>
+            <h3 class="mt-6 text-lg font-bold text-ink-900">{service.title}</h3>
+            <p class="mt-3 text-sm leading-7 text-ink-500">{service.description}</p>
+          </Card>
+        ))
+      }
+    </div>
+  </div>
+</section>

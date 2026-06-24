@@ -1,0 +1,20 @@
+---
+const brands = ["SIEMENS", "HEIDENHAIN", "INDRAMAT", "FANUC", "BOSCH REXROTH"];
+---
+
+<section class="border-b border-ink-100 bg-ink-50/60 py-10">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <p class="mb-6 text-center text-xs font-medium uppercase tracking-wider text-ink-400">
+      متخصص تعمیر و تامین قطعات برندهای معتبر صنعتی
+    </p>
+    <div class="flex flex-wrap items-center justify-center gap-x-12 gap-y-5">
+      {
+        brands.map((brand) => (
+          <span class="text-lg font-bold tracking-wide text-ink-400 transition-colors hover:text-brand-600 sm:text-xl">
+            {brand}
+          </span>
+        ))
+      }
+    </div>
+  </div>
+</section>

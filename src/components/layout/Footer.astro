@@ -1,0 +1,94 @@
+---
+import Icon from "@/components/ui/Icon.astro";
+
+const quickLinks = [
+  { label: "صفحه اصلی", href: "/" },
+  { label: "محصولات", href: "/products" },
+  { label: "درباره ما", href: "/about" },
+  { label: "تماس با ما", href: "/contact" },
+];
+
+const brandLinks = ["Siemens", "Heidenhain", "Indramat", "Fanuc", "Bosch Rexroth"];
+
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="border-t border-ink-100 bg-ink-950 text-ink-200">
+  <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+    <div class="grid gap-12 sm:grid-cols-2 lg:grid-cols-4">
+      <!-- معرفی -->
+      <div class="lg:col-span-1">
+        <div class="mb-4 flex items-center gap-2.5">
+          <span class="flex size-10 items-center justify-center rounded-xl bg-brand-500 text-lg font-bold text-white">
+            S
+          </span>
+          <span class="text-[15px] font-bold text-white">زیمنس‌پارت</span>
+        </div>
+        <p class="text-sm leading-7 text-ink-400">
+          گروه زیمنس‌پارت، فعال در تعمیر تخصصی و تامین قطعات یدکی اصلی دستگاه‌های CNC صنعتی با بیش از یک دهه تجربه فنی.
+        </p>
+      </div>
+
+      <!-- دسترسی سریع -->
+      <div>
+        <h3 class="mb-4 text-sm font-semibold text-white">دسترسی سریع</h3>
+        <ul class="space-y-3">
+          {
+            quickLinks.map((link) => (
+              <li>
+                <a href={link.href} class="text-sm text-ink-400 transition-colors hover:text-brand-400">
+                  {link.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <!-- برندهای تحت پوشش -->
+      <div>
+        <h3 class="mb-4 text-sm font-semibold text-white">برندهای تحت پوشش</h3>
+        <ul class="space-y-3">
+          {
+            brandLinks.map((brand) => (
+              <li>
+                <a
+                  href={`/products?brand=${encodeURIComponent(brand)}`}
+                  class="text-sm text-ink-400 transition-colors hover:text-brand-400"
+                >
+                  {brand}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <!-- اطلاعات تماس -->
+      <div>
+        <h3 class="mb-4 text-sm font-semibold text-white">اطلاعات تماس</h3>
+        <ul class="space-y-3.5 text-sm text-ink-400">
+          <li class="flex items-start gap-2.5">
+            <Icon name="map-pin" class="mt-0.5 size-4 shrink-0 text-brand-400" />
+            <span> 
+              قزوین , شهر صنعتی البرز , بلوار سهروردی , مابین حکمت اول و سوم , ساختمان چمران طبقه ۴
+            </span>
+          </li>
+          <li class="flex items-center gap-2.5">
+            <Icon name="phone" class="size-4 shrink-0 text-brand-400" />
+            <span dir="ltr">028-3431948391</span>
+          </li>
+          <li class="flex items-center gap-2.5">
+            <Icon name="mail" class="size-4 shrink-0 text-brand-400" />
+            <span dir="ltr">info@siemenspart.com</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="mt-12 flex flex-col items-center justify-between gap-3 border-t border-ink-800 pt-6 text-xs text-ink-500 sm:flex-row">
+      <p>© {currentYear} گروه زیمنس‌پارت. تمامی حقوق محفوظ است.</p>
+      <p>طراحی و توسعه با Astro</p>
+    </div>
+  </div>
+</footer>
