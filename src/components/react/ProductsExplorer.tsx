@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import Fuse from "fuse.js";
 import type { ProductEntry } from "@/lib/products";
+import { SUBCATEGORIES } from "@/lib/constants";
 
 interface Props {
   products: ProductEntry[];
@@ -23,39 +24,51 @@ export default function ProductsExplorer({
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedSubCategories, setSelectedSubCategories] = useState<string[]>(
+    [],
+  );
+  const [expandedBrands, setExpandedBrands] = useState<string[]>([]);
+  const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
 
-  // پر کردن فیلتر اولیه از querystring (مثلاً از فوتر/جستجوی ناوبار)
+  // پر کردن فیلتر اولیه از querystring
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const q = params.get("q");
     const brand = params.get("brand");
+    const category = params.get("category");
     if (q) setQuery(q);
     if (brand && brands.includes(brand)) setSelectedBrands([brand]);
-  }, [brands]);
+    if (category && categories.includes(category))
+      setSelectedCategories([category]);
+  }, [brands, categories]);
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedQuery(query), 250);
     return () => clearTimeout(timer);
   }, [query]);
 
-  // ریست صفحه‌بندی هنگام تغییر فیلتر/سرچ
   useEffect(() => {
     setVisibleCount(PAGE_SIZE);
-  }, [debouncedQuery, selectedBrands, selectedCategories]);
+  }, [
+    debouncedQuery,
+    selectedBrands,
+    selectedCategories,
+    selectedSubCategories,
+  ]);
 
   const fuse = useMemo(
     () =>
       new Fuse(products, {
         keys: [
-          { name: "title", weight: 0.4 },
-          { name: "modelCode", weight: 0.35 },
-          { name: "brand", weight: 0.15 },
-          { name: "shortDescription", weight: 0.1 },
+          { name: "modelCode", weight: 0.6 },
+          { name: "title", weight: 0.3 },
+          { name: "brand", weight: 0.1 },
         ],
-        threshold: 0.35,
+        threshold: 0.25,
+        distance: 60,
         ignoreLocation: true,
         minMatchCharLength: 2,
       }),
@@ -63,30 +76,51 @@ export default function ProductsExplorer({
   );
 
   const filteredProducts = useMemo(() => {
-    let base = debouncedQuery.trim()
-      ? fuse.search(debouncedQuery).map((r) => r.item)
-      : products;
+    const trimmed = debouncedQuery.trim();
+    let base: ProductEntry[];
 
-    if (selectedBrands.length > 0) {
+    if (trimmed) {
+      const normalized = trimmed.toLowerCase();
+      const exact = products.filter(
+        (p) =>
+          p.modelCode.toLowerCase().includes(normalized) ||
+          p.title.toLowerCase().includes(normalized) ||
+          p.brand.toLowerCase().includes(normalized),
+      );
+      base = exact.length > 0 ? exact : fuse.search(trimmed).map((r) => r.item);
+    } else {
+      base = products;
+    }
+
+    if (selectedBrands.length > 0)
       base = base.filter((p) => selectedBrands.includes(p.brand));
-    }
-    if (selectedCategories.length > 0) {
+
+    if (selectedCategories.length > 0)
       base = base.filter((p) => selectedCategories.includes(p.category));
-    }
+
+    if (selectedSubCategories.length > 0)
+      base = base.filter(
+        (p) => p.subCategory && selectedSubCategories.includes(p.subCategory),
+      );
+
     return base;
-  }, [debouncedQuery, fuse, products, selectedBrands, selectedCategories]);
+  }, [
+    debouncedQuery,
+    fuse,
+    products,
+    selectedBrands,
+    selectedCategories,
+    selectedSubCategories,
+  ]);
 
   const visibleProducts = filteredProducts.slice(0, visibleCount);
   const hasMore = visibleCount < filteredProducts.length;
 
-  // infinite scroll با IntersectionObserver
   useEffect(() => {
     if (!sentinelRef.current || !hasMore) return;
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting) {
-          setVisibleCount((c) => c + PAGE_SIZE);
-        }
+        if (entries[0].isIntersecting) setVisibleCount((c) => c + PAGE_SIZE);
       },
       { rootMargin: "200px" },
     );
@@ -94,64 +128,193 @@ export default function ProductsExplorer({
     return () => observer.disconnect();
   }, [hasMore]);
 
+  // ——— toggle helpers ———
   function toggleBrand(brand: string) {
     setSelectedBrands((prev) =>
       prev.includes(brand) ? prev.filter((b) => b !== brand) : [...prev, brand],
     );
+    // وقتی برند انتخاب/لغو می‌شود، زیردسته‌های آن هم پاک می‌شوند
+    if (SUBCATEGORIES[brand]) {
+      setSelectedSubCategories((prev) =>
+        prev.filter((s) => !SUBCATEGORIES[brand].includes(s)),
+      );
+    }
   }
+
   function toggleCategory(cat: string) {
     setSelectedCategories((prev) =>
       prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat],
     );
+    if (SUBCATEGORIES[cat]) {
+      setSelectedSubCategories((prev) =>
+        prev.filter((s) => !SUBCATEGORIES[cat].includes(s)),
+      );
+    }
   }
+
+  function toggleSubCategory(sub: string) {
+    setSelectedSubCategories((prev) =>
+      prev.includes(sub) ? prev.filter((s) => s !== sub) : [...prev, sub],
+    );
+  }
+
+  function toggleExpandBrand(brand: string) {
+    setExpandedBrands((prev) =>
+      prev.includes(brand) ? prev.filter((b) => b !== brand) : [...prev, brand],
+    );
+  }
+
+  function toggleExpandCategory(cat: string) {
+    setExpandedCategories((prev) =>
+      prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat],
+    );
+  }
+
   function clearFilters() {
     setSelectedBrands([]);
     setSelectedCategories([]);
+    setSelectedSubCategories([]);
     setQuery("");
   }
 
   const activeFilterCount =
-    selectedBrands.length + selectedCategories.length + (query ? 1 : 0);
+    selectedBrands.length +
+    selectedCategories.length +
+    selectedSubCategories.length +
+    (query ? 1 : 0);
 
+  // ——— Filter Panel ———
   const FilterPanel = (
     <div className="space-y-7">
+      {/* برند */}
       <div>
         <h3 className="mb-3 text-sm font-bold text-ink-900">برند</h3>
-        <div className="space-y-2.5">
-          {brands.map((brand) => (
-            <label
-              key={brand}
-              className="flex cursor-pointer items-center gap-2.5 text-sm text-ink-600"
-            >
-              <input
-                type="checkbox"
-                checked={selectedBrands.includes(brand)}
-                onChange={() => toggleBrand(brand)}
-                className="size-4 rounded border-ink-300 text-brand-500 accent-[#009999] focus:ring-brand-400"
-              />
-              {brand}
-            </label>
-          ))}
+        <div className="space-y-1">
+          {brands.map((brand) => {
+            const hasSubs = Boolean(SUBCATEGORIES[brand]?.length);
+            const isExpanded = expandedBrands.includes(brand);
+            const isChecked = selectedBrands.includes(brand);
+            const subs = SUBCATEGORIES[brand] ?? [];
+
+            return (
+              <div key={brand}>
+                <div className="flex items-center gap-1">
+                  <label className="flex flex-1 cursor-pointer items-center gap-2.5 rounded-lg px-2 py-1.5 text-sm text-ink-600 hover:bg-ink-50 transition-colors">
+                    <input
+                      type="checkbox"
+                      checked={isChecked}
+                      onChange={() => toggleBrand(brand)}
+                      className="size-4 rounded border-ink-300 accent-brand-500"
+                    />
+                    {brand}
+                  </label>
+                  {hasSubs && (
+                    <button
+                      onClick={() => toggleExpandBrand(brand)}
+                      className="flex size-7 items-center justify-center rounded-lg text-ink-400 hover:bg-ink-100 hover:text-brand-600 transition-all"
+                      title="نمایش زیردسته‌ها"
+                    >
+                      <svg
+                        className={`size-3.5 transition-transform duration-200 ${isExpanded ? "rotate-90" : "rotate-180"}`}
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                      >
+                        <path d="m9 18 6-6-6-6" />
+                      </svg>
+                    </button>
+                  )}
+                </div>
+
+                {/* زیردسته‌های برند */}
+                {hasSubs && isExpanded && (
+                  <div className="mr-6 mt-1 space-y-1 border-r-2 border-brand-100 pr-3">
+                    {subs.map((sub) => (
+                      <label
+                        key={sub}
+                        className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1 text-xs text-ink-500 hover:bg-brand-50/60 hover:text-brand-700 transition-colors"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedSubCategories.includes(sub)}
+                          onChange={() => toggleSubCategory(sub)}
+                          className="size-3.5 rounded border-ink-300 accent-[#009999]"
+                        />
+                        {sub}
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
 
+      {/* دسته‌بندی */}
       <div>
         <h3 className="mb-3 text-sm font-bold text-ink-900">دسته‌بندی</h3>
-        <div className="space-y-2.5">
-          {categories.map((cat) => (
-            <label
-              key={cat}
-              className="flex cursor-pointer items-center gap-2.5 text-sm text-ink-600"
-            >
-              <input
-                type="checkbox"
-                checked={selectedCategories.includes(cat)}
-                onChange={() => toggleCategory(cat)}
-                className="size-4 rounded border-ink-300 text-brand-500 accent-[#009999] focus:ring-brand-400"
-              />
-              {categoryLabels[cat] ?? cat}
-            </label>
-          ))}
+        <div className="space-y-1">
+          {categories.map((cat) => {
+            const hasSubs = Boolean(SUBCATEGORIES[cat]?.length);
+            const isExpanded = expandedCategories.includes(cat);
+            const isChecked = selectedCategories.includes(cat);
+            const subs = SUBCATEGORIES[cat] ?? [];
+
+            return (
+              <div key={cat}>
+                <div className="flex items-center gap-1">
+                  <label className="flex flex-1 cursor-pointer items-center gap-2.5 rounded-lg px-2 py-1.5 text-sm text-ink-600 hover:bg-ink-50 transition-colors">
+                    <input
+                      type="checkbox"
+                      checked={isChecked}
+                      onChange={() => toggleCategory(cat)}
+                      className="size-4 rounded border-ink-300 accent-[#009999]"
+                    />
+                    {categoryLabels[cat] ?? cat}
+                  </label>
+                  {hasSubs && (
+                    <button
+                      onClick={() => toggleExpandCategory(cat)}
+                      className="flex size-7 items-center justify-center rounded-lg text-ink-400 hover:bg-ink-100 hover:text-brand-600 transition-all"
+                      title="نمایش زیردسته‌ها"
+                    >
+                      <svg
+                        className={`size-3.5 transition-transform duration-200 ${isExpanded ? "rotate-90" : ""}`}
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                      >
+                        <path d="m9 18 6-6-6-6" />
+                      </svg>
+                    </button>
+                  )}
+                </div>
+
+                {/* زیردسته‌های دسته‌بندی */}
+                {hasSubs && isExpanded && (
+                  <div className="mr-6 mt-1 space-y-1 border-r-2 border-brand-100 pr-3">
+                    {subs.map((sub) => (
+                      <label
+                        key={sub}
+                        className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1 text-xs text-ink-500 hover:bg-brand-50/60 hover:text-brand-700 transition-colors"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedSubCategories.includes(sub)}
+                          onChange={() => toggleSubCategory(sub)}
+                          className="size-3.5 rounded border-ink-300 accent-[#009999]"
+                        />
+                        {sub}
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -170,8 +333,10 @@ export default function ProductsExplorer({
     <div className="grid gap-10 lg:grid-cols-[260px_1fr]">
       {/* فیلتر دسکتاپ */}
       <aside className="hidden lg:block">
-        <div className="sticky top-24 rounded-2xl border border-ink-100 bg-white p-6 shadow-card">
-          {FilterPanel}
+        <div className="sticky top-24 rounded-2xl border border-ink-100 bg-white py-4 ps-6 pe-2 shadow-card">
+          <div className="max-h-[calc(100vh-8rem)] overflow-y-auto ">
+            {FilterPanel}
+          </div>
         </div>
       </aside>
 
@@ -243,7 +408,7 @@ export default function ProductsExplorer({
         )}
 
         {/* گرید محصولات */}
-        <div className="mt-6 grid grid-cols-2 gap-5 sm:grid-cols-3 ">
+        <div className="mt-6 grid grid-cols-2 gap-5 sm:grid-cols-3">
           {visibleProducts.map((product) => (
             <a
               key={product.id}
@@ -264,6 +429,11 @@ export default function ProductsExplorer({
               <div className="flex flex-1 flex-col p-4">
                 <p className="text-xs font-medium text-ink-400">
                   {categoryLabels[product.category] ?? product.category}
+                  {product.subCategory && (
+                    <span className="mr-1 text-ink-300">
+                      · {product.subCategory}
+                    </span>
+                  )}
                 </p>
                 <h3 className="mt-1.5 line-clamp-2 text-sm font-bold leading-6 text-ink-900 group-hover:text-brand-600">
                   {product.title}
@@ -282,11 +452,11 @@ export default function ProductsExplorer({
           ))}
         </div>
 
-        {/* اسکلتون لودینگ هنگام اسکرول بی‌نهایت */}
+        {/* اسکلتون لودینگ */}
         {hasMore && (
           <div
             ref={sentinelRef}
-            className="mt-8 grid grid-cols-2 gap-5 sm:grid-cols-3 xl:grid-cols-4"
+            className="mt-8 grid grid-cols-2 gap-5 sm:grid-cols-3"
           >
             {Array.from({ length: 4 }).map((_, i) => (
               <div
@@ -305,38 +475,68 @@ export default function ProductsExplorer({
         )}
       </div>
 
-      {/* پنل فیلتر موبایل (مودال) */}
+      {/* پنل فیلتر موبایل */}
+      {/* پنل فیلتر موبایل */}
       {mobileFiltersOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
+          {/* بکدراپ */}
           <div
-            className="absolute inset-0 bg-ink-950/40"
+            className="absolute inset-0 bg-ink-950/40 backdrop-blur-sm"
             onClick={() => setMobileFiltersOpen(false)}
           />
-          <div className="absolute inset-y-0 right-0 w-[85%] max-w-sm overflow-y-auto bg-white p-6 shadow-2xl">
-            <div className="mb-6 flex items-center justify-between">
-              <h2 className="text-base font-bold text-ink-900">فیلترها</h2>
+
+          {/* پنل سایدبار */}
+          <div className="absolute inset-y-0 right-0 flex w-[85%] max-w-sm flex-col bg-white shadow-2xl">
+            {/* هدر ثابت */}
+            <div className="shrink-0 border-b border-ink-100 px-6 py-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-base font-bold text-ink-900">فیلترها</h2>
+                <button
+                  onClick={() => setMobileFiltersOpen(false)}
+                  className="rounded-lg p-1.5 text-ink-400 transition-colors hover:bg-ink-50 hover:text-ink-700"
+                >
+                  <svg
+                    className="size-5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path d="M18 6 6 18M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* نمایش تعداد فیلترهای فعال */}
+              {activeFilterCount > 0 && (
+                <div className="mt-2 flex items-center gap-2">
+                  <span className="text-xs text-ink-500">
+                    {activeFilterCount} فیلتر فعال
+                  </span>
+                  <button
+                    onClick={clearFilters}
+                    className="text-xs text-brand-600 hover:text-brand-700"
+                  >
+                    حذف همه
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* محتوای اسکرول‌شونده */}
+            <div className="flex-1 overflow-y-auto px-6 py-4 scroll-pb-4">
+              {FilterPanel}
+            </div>
+
+            {/* دکمه ثابت پایین */}
+            <div className="shrink-0 border-t border-ink-100 bg-white/95 px-6 py-4 backdrop-blur-sm">
               <button
                 onClick={() => setMobileFiltersOpen(false)}
-                className="text-ink-400 hover:text-ink-700"
+                className="w-full rounded-xl bg-brand-500 py-3 text-sm font-medium text-white transition-colors hover:bg-brand-600 active:scale-[0.98]"
               >
-                <svg
-                  className="size-6"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path d="M18 6 6 18M6 6l12 12" />
-                </svg>
+                نمایش {filteredProducts.length.toLocaleString("fa-IR")} نتیجه
               </button>
             </div>
-            {FilterPanel}
-            <button
-              onClick={() => setMobileFiltersOpen(false)}
-              className="mt-8 w-full rounded-xl bg-brand-500 py-3 text-sm font-medium text-white"
-            >
-              نمایش {filteredProducts.length.toLocaleString("fa-IR")} نتیجه
-            </button>
           </div>
         </div>
       )}

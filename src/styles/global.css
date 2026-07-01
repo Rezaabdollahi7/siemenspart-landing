@@ -148,3 +148,23 @@ body {
 .animate-fade-up {
   animation: fade-up 0.6s ease-out both;
 }
+
+/* در فایل CSS گلوبال */
+.overflow-y-auto {
+  /* scrollbar-width: thin; */
+  scrollbar-color: #009999 #f0f0f0;
+}
+
+.overflow-y-auto::-webkit-scrollbar {
+  width: 4px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 8px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: #009999;
+  border-radius: 8px;
+}

@@ -1,0 +1,112 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Button from "@/components/ui/Button.astro";
+import Icon from "@/components/ui/Icon.astro";
+import { articles, getArticleBySlug } from "@/data/articles";
+
+export function getStaticPaths() {
+  return articles.map((article) => ({
+    params: { slug: article.slug },
+  }));
+}
+
+const { slug } = Astro.params;
+const article = getArticleBySlug(slug);
+if (!article) return Astro.redirect("/articles");
+---
+
+<Layout title={article.title} description={article.excerpt}>
+  <!-- هدر مقاله -->
+  <section class="bg-ink-950 py-16 sm:py-20">
+    <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+      <nav class="mb-6 flex items-center gap-2 text-sm text-ink-400">
+        <a href="/" class="hover:text-brand-400">خانه</a>
+        <Icon name="chevron-left" class="size-3.5 rotate-180" />
+        <a href="/articles" class="hover:text-brand-400">مقالات</a>
+        <Icon name="chevron-left" class="size-3.5 rotate-180" />
+        <span class="truncate text-ink-500">{article.title}</span>
+      </nav>
+
+      <span class="inline-block rounded-full bg-brand-500/20 px-3 py-1 text-xs font-medium text-brand-300">
+        {article.category}
+      </span>
+
+      <h1 class="mt-4 text-2xl font-bold leading-[1.4] text-white sm:text-3xl lg:text-4xl">
+        {article.title}
+      </h1>
+
+      <p class="mt-4 text-base leading-8 text-ink-300">{article.excerpt}</p>
+
+      <div class="mt-6 flex items-center gap-4 text-sm text-ink-400">
+        <span class="flex items-center gap-1.5">
+          <Icon name="clock" class="size-4" />
+          {article.readingTime} دقیقه مطالعه
+        </span>
+        <span class="size-1 rounded-full bg-ink-600" />
+        <span>{article.date}</span>
+        <span class="size-1 rounded-full bg-ink-600" />
+        <span>تیم فنی سیمنس‌پارت</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- متن مقاله -->
+  <article class="py-14 sm:py-20">
+    <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+      <div class="space-y-10">
+        {
+          article.sections.map((section) => (
+            <div>
+              {section.heading && (
+                <h2 class="mb-4 text-xl font-bold text-ink-900">{section.heading}</h2>
+              )}
+
+              {section.body.split("\n\n").map((paragraph) => (
+                <p class="mb-4 leading-8 text-ink-600">{paragraph}</p>
+              ))}
+
+              {section.list && section.list.length > 0 && (
+                <ul class="mt-4 space-y-3">
+                  {section.list.map((item) => (
+                    <li class="flex items-start gap-3">
+                      <span class="mt-2 flex size-1.5 shrink-0 rounded-full bg-brand-500" />
+                      <span class="leading-7 text-ink-600">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ))
+        }
+      </div>
+
+      <!-- فوتر مقاله -->
+      <div class="mt-16 rounded-2xl border border-brand-100 bg-brand-50/50 p-8 text-center">
+        <h3 class="text-lg font-bold text-ink-900">نیاز به مشاوره فنی دارید؟</h3>
+        <p class="mt-2 text-sm leading-7 text-ink-500">
+          تیم فنی سیمنس‌پارت برای پاسخ به سوالات فنی و مشاوره رایگان در خدمت شماست.
+        </p>
+        <div class="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
+          <Button href="/contact" size="md">
+            <Icon name="phone" class="size-4" />
+            تماس با تیم فنی
+          </Button>
+          <Button href="/products" variant="outline" size="md">
+            مشاهده محصولات
+          </Button>
+        </div>
+      </div>
+
+      <!-- ناوبری بین مقالات -->
+      <div class="mt-10 flex justify-center">
+        <a
+          href="/articles"
+          class="inline-flex items-center gap-2 text-sm font-medium text-brand-600 hover:text-brand-700"
+        >
+          <Icon name="arrow-left" class="size-4 rotate-180" />
+          بازگشت به همه مقالات
+        </a>
+      </div>
+    </div>
+  </article>
+</Layout>

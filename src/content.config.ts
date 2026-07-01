@@ -1,13 +1,18 @@
 import { defineCollection, z } from "astro:content";
 import { file } from "astro/loaders";
 
-// اسکیمای محصولات؛ منبع داده فایل products.json است
-// (۳۹۳ قطعه واقعی، مهاجرت‌شده از کاتالوگ ووکامرس سایت قدیم)
 const products = defineCollection({
   loader: file("src/content/products/products.json"),
   schema: z.object({
     id: z.string(),
-    brand: z.enum(["Siemens", "Heidenhain", "Indramat", "Fanuc", "Mitsubishi", "Other"]),
+    brand: z.enum([
+      "Siemens",
+      "Heidenhain",
+      "Indramat",
+      "Fanuc",
+      "Mitsubishi",
+      "Other",
+    ]),
     category: z.enum([
       "Controller",
       "Drive",
@@ -22,6 +27,7 @@ const products = defineCollection({
       "Cable",
       "Other",
     ]),
+    subCategory: z.string().optional(),
     modelCode: z.string(),
     title: z.string(),
     shortDescription: z.string(),
