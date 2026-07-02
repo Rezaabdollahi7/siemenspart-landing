@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://siemenspart.com/sitemap-index.xml
