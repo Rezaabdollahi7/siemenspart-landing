@@ -4,9 +4,9 @@ import Icon from "@/components/ui/Icon.astro";
 import Button from "@/components/ui/Button.astro";
 
 const contactInfo = [
-  { icon: "phone" as const, label: "تلفن تماس", value: "028-3431948391", dir: "ltr" },
+  { icon: "phone" as const, label: "تلفن تماس", value: "028-32237206", dir: "ltr" },
   { icon: "mail" as const, label: "ایمیل", value: "info@siemenspart.com", dir: "ltr" },
-  { icon: "map-pin" as const, label: "آدرس", value: "قزوین , شهر صنعتی البرز , بلوار سهروردی , مابین حکمت اول و سوم , ساختمان چمران طبقه ۴", dir: "rtl" },
+  { icon: "map-pin" as const, label: "آدرس", value: "قزوین , شهر صنعتی البرز , بلوار سهروردی , مابین حکمت اول و سوم ,مجتمع چمران , ساختمان حسینی , طبقه ۴ واحد شرقی", dir: "rtl" },
   { icon: "clock" as const, label: "ساعت کاری", value: "شنبه تا پنجشنبه ۸ تا ۱۷", dir: "rtl" },
 ];
 ---
@@ -31,7 +31,7 @@ const contactInfo = [
                   <Icon name={item.icon} class="size-5 text-brand-600" />
                 </div>
                 <p class="mt-4 text-xs font-medium text-ink-400">{item.label}</p>
-                <p class="mt-1 text-sm font-medium text-ink-800" dir={item.dir}>
+                <p class="mt-1 text-sm font-medium text-ink-800 text-justify" dir={item.dir}>
                   {item.value}
                 </p>
               </div>
